@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content=
+    "width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>PassMan</title>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>
+                PassMan
+            </h1>
+            <h1>
+                Password Manager
+            </h1>
+        </header>
+            <!-- login -->
+            <h2>Login to PassMan</h2>
+            <form id="loginPage">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p id="loginError" class="error"></p>
+            <button id="createAccountBtn">Create Account</button>
+
+        <!-- create account -->
+        <div id="createAccountPage" style="display: none;">
+            <h2>Create a New Account</h2>
+            <form id="newAccountPage">
+                <input type="text" id="newUsername" placeholder="New Username" required>
+                <input type="password" id="newPassword" placeholder="New Password" required>
+                <button type="submit">Create Account</button>
+            </form>
+            <p id="createAccountError" class="error"></p>
+            <button id="backToLoginBtn">Back to Login</button>
+        </div>
+
+        <!-- dashboard -->
+        <div id="dashboard" style="display: none;">
+            <!-- dashboard content -->
+        </div>
+
+    </div>
+</body>
+</html>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // this checks if userData is already stored
+    let userData = localStorage.getItem('passman_userdata');
+         if (!userData) {
+                userData = {};
+        } else {
+                userData = JSON.parse(userData);
+        }
+    
+    // to toggle between log in and create account
+    function togglePages() {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('createAccountPage').style.display = 'block';
+        document.getElementById('createAccountBtn').style.display = 'none';
+        }
+
+        document.getElementById('createAccountBtn').style.display = 'inline-block';
+
+    // event listener for "create account" button
+    document.getElementById('createAccountBtn').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default button behavior
+        togglePages(); // Show create account
+    });
+
+    document.getElementById('backToLoginBtn').addEventListener('click', function() {
+        showLoginPage(); //shows login page
+    });
+
+    // to create new account
+    function createAccount(username, password) {
+        // Check if the username is already taken
+        if (username === userData.username) {
+            displayCreateAccountError('Username already exists. Please choose a different one.');
+        } else {
+            // if username is not taken create account and display dasbhoard
+            userData.username = username;
+            let encryptedPassword = encryptData(password); //encrypts passwrd before storing
+            userData.password = encryptedPassword;
+            localStorage.setItem('passman_userdata', JSON.stringify(userData));
+            showDashboard(); // Display the dashboard
+        }
+    }
+
+    // to display error messages for create account
+    function displayCreateAccountError(message) {
+        let errorElement = document.getElementById('createAccountError');
+        errorElement.textContent = message;
+    }
+
+    // for create account form submission
+    document.getElementById('createAccountPage').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+        let username = document.getElementById('newUsername').value;
+        let password = document.getElementById('newPassword').value;
+        createAccount(username, password); // Call the createAccount function
+    });
+
+    // to display the dashboard
+    function showDashboard() {
+        document.getElementById('createAccountPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+
+    // to display the login page
+    function showLoginPage() {
+        document.getElementById('loginPage').style.display = 'block';
+        document.getElementById('createAccountPage').style.display = 'none';
+        document.getElementById('createAccountBtn').style.display = 'inline-block';
+    }
+    
+    //data encryption
+    function encryptData(data) {
+
+        return btoa(Data)
+    }
+
+    //data decryption
+    function decryptData(encryptedData) {
+
+        return atob(encryptedData);
+    }
+
+    //event listenr for the login form submission
+    document.getElementById('loginPage').addEventListener('submit', function(event) {
+                event.preventDefault(); // prevents form submission
+                let username = document.getElementById('username').value;
+                let password = document.getElementById('password').value;
+                // checks if entered username exists and password matches
+                if (username === userData.username && encryptData(password) === userData.password) {
+                    showDashboard(); // displays the dashboard if login is successful yay:)
+                } else {
+                    displayLoginError('Invalid username or password. Please try again.');
+                }
+            });
+
+            // displays login error messages
+            function displayLoginError(message) {
+                let errorElement = document.getElementById('loginError');
+                errorElement.textContent = message;
+            }
+});
+
+</script>
