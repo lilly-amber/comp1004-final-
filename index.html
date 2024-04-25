@@ -42,7 +42,11 @@
 
         <!-- dashboard -->
         <div id="dashboard" style="display: none;">
-            <!-- dashboard content -->
+            <h2>Welcome to PassMan Dashboard</h2>
+            <div id="passwordList">
+
+            </div>
+            <button id="logoutBtn">Logout</button>
         </div>
 
     </div>
@@ -150,6 +154,14 @@
                 let errorElement = document.getElementById('loginError');
                 errorElement.textContent = message;
             }
+
+    // for the logout button
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    // clear user data from localStorage
+    localStorage.removeItem('passman_userdata');
+    // redirect to login page
+    showLoginPage();
+});
 });
 
 </script>
