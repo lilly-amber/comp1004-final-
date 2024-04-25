@@ -58,9 +58,9 @@
     // this checks if userData is already stored
     let userData = localStorage.getItem('passman_userdata');
          if (!userData) {
-                userData = {};
+            userData = {};
         } else {
-                userData = JSON.parse(userData);
+            userData = JSON.parse(userData);
         }
     
     // to toggle between log in and create account
@@ -68,6 +68,7 @@
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('createAccountPage').style.display = 'block';
         document.getElementById('createAccountBtn').style.display = 'none';
+        clearErrorMessages();
         }
 
         document.getElementById('createAccountBtn').style.display = 'inline-block';
@@ -75,10 +76,12 @@
     // event listener for "create account" button
     document.getElementById('createAccountBtn').addEventListener('click', function(event) {
         event.preventDefault(); // Prevent default button behavior
+        clearErrorMessages(); //tidy tidy
         togglePages(); // Show create account
     });
 
     document.getElementById('backToLoginBtn').addEventListener('click', function() {
+        clearErrorMessages();
         showLoginPage(); //shows login page
     });
 
@@ -99,6 +102,7 @@
 
     // to display error messages for create account
     function displayCreateAccountError(message) {
+        clearErrorMessages(); //keepin it tidy
         let errorElement = document.getElementById('createAccountError');
         errorElement.textContent = message;
     }
@@ -138,30 +142,42 @@
 
     //event listenr for the login form submission
     document.getElementById('loginPage').addEventListener('submit', function(event) {
-                event.preventDefault(); // prevents form submission
-                let username = document.getElementById('username').value;
-                let password = document.getElementById('password').value;
-                // checks if entered username exists and password matches
-                if (username === userData.username && encryptData(password) === userData.password) {
-                    showDashboard(); // displays the dashboard if login is successful yay:)
-                } else {
-                    displayLoginError('Invalid username or password. Please try again.');
-                }
-            });
+        event.preventDefault(); // prevents form submission
+        let username = document.getElementById('username').value;
+        let password = document.getElementById('password').value;
+        // checks if entered username exists and password matches
+        if (username === userData.username && encryptData(password) === userData.password) {
+            showDashboard(); // displays the dashboard if login is successful yay:)
+        } else {
+             displayLoginError('Invalid username or password. Please try again.');
+        }
+     });
 
-            // displays login error messages
-            function displayLoginError(message) {
-                let errorElement = document.getElementById('loginError');
-                errorElement.textContent = message;
-            }
+    // displays login error messages
+    function displayLoginError(message) {
+             clearErrorMessages();
+             let errorElement = document.getElementById('loginError');
+             errorElement.textContent = message;
+     }
 
     // for the logout button
-document.getElementById('logoutBtn').addEventListener('click', function() {
-    // clear user data from localStorage
-    localStorage.removeItem('passman_userdata');
-    // redirect to login page
-    showLoginPage();
-});
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+            // clear user data from localStorage
+            localStorage.removeItem('passman_userdata');
+            // redirect to login page
+            showLoginPage();
+    });
+
+         function clearErrorMessages() {
+    document.getElementById('createAccountError').textContent = '';
+    document.getElementById('loginError').textContent = '';
+}
+
+function clearErrorMessages() {
+    document.getElementById('createAccountError').textContent = '';
+    document.getElementById('loginError').textContent = ''; //just to make sure
+}
+
 });
 
 </script>
