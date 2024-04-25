@@ -31,7 +31,7 @@
         <!-- create account -->
         <div id="createAccountPage" style="display: none;">
             <h2>Create a New Account</h2>
-            <form id="newAccountPage">
+            <form id="createAccountForm">
                 <input type="text" id="newUsername" placeholder="New Username" required>
                 <input type="password" id="newPassword" placeholder="New Password" required>
                 <button type="submit">Create Account</button>
@@ -45,8 +45,8 @@
             <h2>Welcome to PassMan Dashboard</h2>
             <form id="addPasswordForm">
                 <input type="text" id="website" placeholder="Website" required>
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
+                <input type="text" id="siteUsername" placeholder="Username" required>
+                <input type="text" id="sitePassword" placeholder="Password" required>
                 <button type="submit">Add Password</button>
             </form>
 
@@ -108,7 +108,7 @@ console.log("Decrypted Test Data:", decryptedTestData);
         password: '',
         passwords: [],
     };
-    
+});
     // to toggle between log in and create account
     function togglePages() {
         document.getElementById('loginPage').style.display = 'none';
@@ -125,6 +125,7 @@ console.log("Decrypted Test Data:", decryptedTestData);
         clearErrorMessages(); //tidy tidy
         togglePages(); // Show create account
     });
+    
 
     document.getElementById('backToLoginBtn').addEventListener('click', function() {
         event.preventDefault();
@@ -137,12 +138,13 @@ console.log("Decrypted Test Data:", decryptedTestData);
         // Check if the username is already taken
         if (localStorage.getItem('passman_userdata') !== null && userData.username !== '') {
             displayCreateAccountError('Username already exists. Please choose a different one.');
+            return false;
         } else {
             userData.username = username;
             let encryptedPassword = encryptData(password, key);
             userData.password = encryptedPassword;
             localStorage.setItem('passman_userdata', JSON.stringify(userData));
-            showDashboard(); // Display the dashboard
+            return true; // displays the dashboard
         }
     }
 
@@ -154,12 +156,13 @@ console.log("Decrypted Test Data:", decryptedTestData);
     }
 
     // for create account form submission
-    document.getElementById('createAccountPage').addEventListener('submit', function(event) {
+    document.getElementById('createAccountForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent form submission
         let username = document.getElementById('newUsername').value;
         let password = document.getElementById('newPassword').value;
-        createAccount(username, password); // Call the createAccount function
+            if (createAccount(username, password)) { // Check if account creation is successful
         showDashboard();
+            }
     });
 
     // to display the dashboard
@@ -180,7 +183,8 @@ console.log("Decrypted Test Data:", decryptedTestData);
 
     //event listenr for the login form submission
     document.getElementById('loginPage').addEventListener('submit', function(event) {
-        event.preventDefault(); // prevents form submission
+        event.preventDefault();
+        
         let username = document.getElementById('username').value;
         let password = document.getElementById('password').value;
         
@@ -189,9 +193,9 @@ console.log("Decrypted Test Data:", decryptedTestData);
             userData = storedUserData; //stores new user data
             showDashboard(); // displays the dashboard if login is successful yay:)
         } else {
-             displayLoginError('Invalid username or password. Please try again.');
+            displayLoginError('Invalid username or password. Please try again.');
         }
-     });
+    });
 
     // displays login error messages
     function displayLoginError(message) {
@@ -228,6 +232,7 @@ console.log("Decrypted Test Data:", decryptedTestData);
         let usernameCell = row.insertCell(1);
         let passwordCell = row.insertCell(2);
         let deleteCell = row.insertCell(3); //deleting featuree yay
+        let editCell = row.insertCell(3); // editing yay
 
         websiteCell.textContent = entry.website;
         usernameCell.textContent = entry.username;
@@ -239,19 +244,34 @@ console.log("Decrypted Test Data:", decryptedTestData);
             deletePassword(index);
         });
         deleteCell.appendChild(deleteButton);
-    });
-    }
 
+        let editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', function() {
+            editPassword(index);
+        });
+        editCell.appendChild(editButton);
+        });
+    }
     function deletePassword(index) {
         userData.passwords.splice(index, 1); 
         localStorage.setItem('passman_userdata', JSON.stringify(userData));
         displayPasswordList();
     }
 
+    function editPassword(index) {
+        let entry = userData.passwords[index];
+        document.getElementById('website').value = entry.website;
+        document.getElementById('username').value = entry.username;
+        document.getElementById('password').value = entry.password;
+    }
+
     // adds a new password
-    function addPassword(website, username, password) {
-        console.log("Adding password:", website, username, password);
-        // Create a new password object
+    function addPassword() {
+        let website = document.getElementById('website').value;
+        let username = document.getElementById('siteUsername').value;
+        let password = document.getElementById('sitePassword').value;
+
         const newPassword = {
             website: website,
             username: username,
@@ -261,23 +281,17 @@ console.log("Decrypted Test Data:", decryptedTestData);
         userData.passwords.push(newPassword);
         // stores updated user data in local storage
         localStorage.setItem('passman_userdata', JSON.stringify(userData));
+        document.getElementById('website').value = '';
+        document.getElementById('siteUsername').value = '';
+        document.getElementById('sitePassword').value = '';
         // updates displayed password list
         displayPasswordList();
     }
 
     document.getElementById('addPasswordForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent form submission
-    let website = document.getElementById('website').value;
-    let username = document.getElementById('username').value;
-    let password = document.getElementById('password').value;
-    addPassword(website, username, password); // Call the addPassword function
-    
-    document.getElementById('website').value = '';
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-});
-
-});
+    addPassword(); // Call the addPassword function
+    });
 
 </script>
 </body>
