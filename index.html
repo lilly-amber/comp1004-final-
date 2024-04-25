@@ -53,12 +53,47 @@
 </body>
 </html>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
+
+const key = "Willmander852";
+const originalData = "Sensitive information";
+const encryptedData = encryptData(originalData, key);
+console.log("Encrypted:", encryptedData);
+const decryptedData = decryptData(encryptedData, key);
+console.log("Decrypted:", decryptedData);
+
+    // data encryption
+    function encryptData(data, key) {
+        return CryptoJS.AES.encrypt(data, key).toString();
+    }
+
+    // data decryption
+    function decryptData(encryptedData, key) {
+        const bytes = CryptoJS.AES.decrypt(encryptedData, key);
+        return bytes.toString(CryptoJS.enc.Utf8);
+    }
+
+    //encryption test//
+    const testData = "Hello, World!";
+const encryptedTestData = encryptData(testData, key);
+console.log("Encrypted Test Data:", encryptedTestData);
+
+const decryptedTestData = decryptData(encryptedTestData, key);
+console.log("Decrypted Test Data:", decryptedTestData);
+
+    //test//
+
+
   document.addEventListener('DOMContentLoaded', function() {
     // this checks if userData is already stored
     let userData = localStorage.getItem('passman_userdata');
-         if (!userData) {
-            userData = {};
+        if (!userData) {
+            userData = {
+                username: '',
+                password: '',
+                passwords: [],
+            };
         } else {
             userData = JSON.parse(userData);
         }
@@ -71,7 +106,7 @@
         clearErrorMessages();
         }
 
-        document.getElementById('createAccountBtn').style.display = 'inline-block';
+    document.getElementById('createAccountBtn').style.display = 'inline-block';
 
     // event listener for "create account" button
     document.getElementById('createAccountBtn').addEventListener('click', function(event) {
@@ -127,18 +162,6 @@
         document.getElementById('createAccountPage').style.display = 'none';
         document.getElementById('createAccountBtn').style.display = 'inline-block';
     }
-    
-    //data encryption
-    function encryptData(data) {
-
-        return btoa(Data)
-    }
-
-    //data decryption
-    function decryptData(encryptedData) {
-
-        return atob(encryptedData);
-    }
 
     //event listenr for the login form submission
     document.getElementById('loginPage').addEventListener('submit', function(event) {
@@ -146,7 +169,7 @@
         let username = document.getElementById('username').value;
         let password = document.getElementById('password').value;
         // checks if entered username exists and password matches
-        if (username === userData.username && encryptData(password) === userData.password) {
+        if (username === userData.username && decryptData(userData.password, key) === password) {
             showDashboard(); // displays the dashboard if login is successful yay:)
         } else {
              displayLoginError('Invalid username or password. Please try again.');
@@ -155,28 +178,47 @@
 
     // displays login error messages
     function displayLoginError(message) {
-             clearErrorMessages();
-             let errorElement = document.getElementById('loginError');
-             errorElement.textContent = message;
+        clearErrorMessages();
+        let errorElement = document.getElementById('loginError');
+        errorElement.textContent = message;
      }
 
     // for the logout button
     document.getElementById('logoutBtn').addEventListener('click', function() {
-            // clear user data from localStorage
-            localStorage.removeItem('passman_userdata');
-            // redirect to login page
-            showLoginPage();
+        // clear user data from localStorage
+        localStorage.removeItem('passman_userdata');
+        // redirect to login page
+        showLoginPage();
     });
 
-         function clearErrorMessages() {
-    document.getElementById('createAccountError').textContent = '';
-    document.getElementById('loginError').textContent = '';
-}
+    function clearErrorMessages() {
+        document.getElementById('createAccountError').textContent = '';
+        document.getElementById('loginError').textContent = ''; //just to make sure
+    }
 
-function clearErrorMessages() {
-    document.getElementById('createAccountError').textContent = '';
-    document.getElementById('loginError').textContent = ''; //just to make sure
-}
+    function displayPasswordList() {
+        let passwordList = document.getElementById('passwordList');
+        passwordList.innerHTML = ''; // Clear previous list
+        userData.passwords.forEach(function(password) {
+        let passwordItem = document.createElement('div');
+        passwordItem.textContent = password;
+        passwordList.appendChild(passwordItem);
+    });
+    }
+
+    // adds a new password
+    function addPassword(password) {
+        userData.passwords.push(password);
+        localStorage.setItem('passman_userdata', JSON.stringify(userData));
+        displayPasswordList(); // Update displayed password list
+    }
+
+    // calls displayPasswordList
+    function showDashboard() {
+        document.getElementById('createAccountPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        displayPasswordList();
+    }
 
 });
 
