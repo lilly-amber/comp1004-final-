@@ -130,3 +130,11 @@ footer {
     }
 }
 
+#passwordListDiv {
+    margin: 0 auto; /* This centers the container horizontally */
+    width: 50%; /* Adjust the width as needed */
+}
+
+#passwordList {
+    width: 100%; /* This ensures the table fills the container width */
+}

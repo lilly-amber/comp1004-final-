@@ -49,13 +49,25 @@
                 <input type="password" id="password" placeholder="Password" required>
                 <button type="submit">Add Password</button>
             </form>
-            <div id="passwordList">
 
-            </div>
-            <button id="logoutBtn">Logout</button>
+        <!-- Password table -->
+        <div id="passwordListDiv">
+        <table id="passwordList">
+            <thead>
+                <tr>
+                    <th>Website</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                </tr>
+            </thead>
+            <tbody id="passwordListBody">
+
+            </tbody>
+        </table>
         </div>
-
+        <button id="logoutBtn">Logout</button>
     </div>
+
 
 </html>
 
@@ -207,16 +219,20 @@ console.log("Decrypted Test Data:", decryptedTestData);
 
     function displayPasswordList() {
         let passwordList = document.getElementById('passwordList');
-        passwordList.innerHTML = ''; // Clear previous list
-        userData.passwords.forEach(function(password) {
-        let passwordItem = document.createElement('div');
-        passwordItem.textContent = password;
-        passwordList.appendChild(passwordItem);
+        userData.passwords.forEach(function(entry) {
+        let row = passwordList.insertRow();
+        let websiteCell = row.insertCell(0);
+        let usernameCell = row.insertCell(1);
+        let passwordCell = row.insertCell(2);
+        websiteCell.textContent = entry.website;
+        usernameCell.textContent = entry.username;
+        passwordCell.textContent = entry.password;
     });
     }
 
     // adds a new password
     function addPassword(website, username, password) {
+        console.log("Adding password:", website, username, password);
         // Create a new password object
         const newPassword = {
             website: website,
@@ -237,6 +253,10 @@ console.log("Decrypted Test Data:", decryptedTestData);
     let username = document.getElementById('username').value;
     let password = document.getElementById('password').value;
     addPassword(website, username, password); // Call the addPassword function
+    
+    document.getElementById('website').value = '';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 });
 
 });
