@@ -34,6 +34,9 @@
             <form id="createAccountForm">
                 <input type="text" id="newUsername" placeholder="New Username" required>
                 <input type="password" id="newPassword" placeholder="New Password" required>
+                <div class="password-strength-container">
+                <div id="password-strength"></div>
+                </div>
                 <button type="submit">Create Account</button>
             </form>
             <p id="createAccountError" class="error"></p>
@@ -91,6 +94,9 @@ console.log("Decrypted:", decryptedData);
         const bytes = CryptoJS.AES.decrypt(encryptedData, key);
         return bytes.toString(CryptoJS.enc.Utf8);
     }
+
+    let userData;
+
   document.addEventListener('DOMContentLoaded', function() {
 
 ///////////// Test data and encryption/decryption test//////////////
@@ -103,11 +109,12 @@ console.log("Decrypted Test Data:", decryptedTestData);
 ////////////////////////////////////////////////////////////////////
 
     // this checks if userData is already stored
-    let userData = JSON.parse(localStorage.getItem('passman_userdata')) || {
+         userData = JSON.parse(localStorage.getItem('passman_userdata')) || {
         username: '',
         password: '',
         passwords: [],
     };
+    console.log('Retrieved user data:', userData);
 });
     // to toggle between log in and create account
     function togglePages() {
@@ -127,7 +134,7 @@ console.log("Decrypted Test Data:", decryptedTestData);
     });
     
 
-    document.getElementById('backToLoginBtn').addEventListener('click', function() {
+    document.getElementById('backToLoginBtn').addEventListener('click', function(event) {
         event.preventDefault();
         clearErrorMessages();
         showLoginPage(); //shows login page
@@ -135,6 +142,13 @@ console.log("Decrypted Test Data:", decryptedTestData);
 
     // to create new account
     function createAccount(username, password) {
+
+        let userData = JSON.parse(localStorage.getItem('passman_userdata')) || {
+        username: '',
+        password: '',
+        passwords: [],
+    };
+
         // Check if the username is already taken
         if (localStorage.getItem('passman_userdata') !== null && userData.username !== '') {
             displayCreateAccountError('Username already exists. Please choose a different one.');
@@ -171,26 +185,27 @@ console.log("Decrypted Test Data:", decryptedTestData);
         document.getElementById('createAccountPage').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         document.getElementById('createAccountBtn').style.display = 'none';
-        displayPasswordList();
+        clearErrorMessages();
+        displayPasswordList(userData);
     }
 
-    // to display the login page
+    // to display login page
     function showLoginPage() {
         document.getElementById('loginPage').style.display = 'block';
         document.getElementById('createAccountPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'none';
         document.getElementById('createAccountBtn').style.display = 'inline-block';
+        clearErrorMessages(); 
     }
 
     //event listenr for the login form submission
     document.getElementById('loginPage').addEventListener('submit', function(event) {
         event.preventDefault();
-        
         let username = document.getElementById('username').value;
         let password = document.getElementById('password').value;
         
         let storedUserData = JSON.parse(localStorage.getItem('passman_userdata'));
         if (storedUserData && storedUserData.username === username && decryptData(storedUserData.password, key) === password) {
-            userData = storedUserData; //stores new user data
             showDashboard(); // displays the dashboard if login is successful yay:)
         } else {
             displayLoginError('Invalid username or password. Please try again.');
@@ -222,7 +237,7 @@ console.log("Decrypted Test Data:", decryptedTestData);
         document.getElementById('loginError').textContent = ''; //just to make sure
     }
 
-    function displayPasswordList() {
+    function displayPasswordList(userData) {
         let passwordList = document.getElementById('passwordList');
         passwordList.innerHTML = '';
 
@@ -256,7 +271,7 @@ console.log("Decrypted Test Data:", decryptedTestData);
     function deletePassword(index) {
         userData.passwords.splice(index, 1); 
         localStorage.setItem('passman_userdata', JSON.stringify(userData));
-        displayPasswordList();
+        displayPasswordList(userData);
     }
 
     function editPassword(index) {
@@ -292,6 +307,49 @@ console.log("Decrypted Test Data:", decryptedTestData);
     event.preventDefault(); // Prevent form submission
     addPassword(); // Call the addPassword function
     });
+
+    function checkPasswordStrength() {
+    let password = document.getElementById('newPassword').value;
+    let strength = 0;
+
+    // check length
+    if (password.length >= 8) {
+        strength += 1;
+    }
+
+    // uppercase
+    if (/[A-Z]/.test(password)) {
+        strength += 1;
+    }
+
+    // lowercase
+    if (/[a-z]/.test(password)) {
+        strength += 1;
+    }
+
+    /// numbers
+    if (/\d/.test(password)) {
+        strength += 1;
+    }
+
+    // spec characters
+    if (/[^A-Za-z0-9]/.test(password)) {
+        strength += 1;
+    }
+
+    let strengthIndicator = document.getElementById('password-strength');
+    strengthIndicator.className = '';
+    if (strength === 0) {
+        strengthIndicator.classList.add('strength-weak');
+    } else if (strength > 0 && strength <= 3) {
+        strengthIndicator.classList.add('strength-medium');
+    } else {
+        strengthIndicator.classList.add('strength-strong');
+    }
+}
+document.getElementById('newPassword').addEventListener('input', function() {
+    checkPasswordStrength();
+});
 
 </script>
 </body>

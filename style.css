@@ -138,3 +138,32 @@ footer {
 #passwordList {
     width: 100%; /* This ensures the table fills the container width */
 }
+
+.password-strength-container {
+    margin-top: 10px;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center; 
+}
+
+
+#password-strength {
+    margin-top: 10px;
+    width: 200px;
+    height: 10px;
+    border: 1px solid #cccccc;
+
+}
+
+.strength-weak {
+    background-color: #bd0202;
+}
+
+.strength-medium {
+    background-color: #f4c047;
+}
+
+.strength-strong {
+    background-color: #30e830;
+}
