@@ -167,6 +167,7 @@ console.log("Decrypted Test Data:", decryptedTestData);
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('createAccountPage').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('createAccountBtn').style.display = 'none';
         displayPasswordList();
     }
 
@@ -219,15 +220,32 @@ console.log("Decrypted Test Data:", decryptedTestData);
 
     function displayPasswordList() {
         let passwordList = document.getElementById('passwordList');
-        userData.passwords.forEach(function(entry) {
+        passwordList.innerHTML = '';
+
+        userData.passwords.forEach(function(entry, index) {
         let row = passwordList.insertRow();
         let websiteCell = row.insertCell(0);
         let usernameCell = row.insertCell(1);
         let passwordCell = row.insertCell(2);
+        let deleteCell = row.insertCell(3); //deleting featuree yay
+
         websiteCell.textContent = entry.website;
         usernameCell.textContent = entry.username;
         passwordCell.textContent = entry.password;
+        
+        let deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', function() {
+            deletePassword(index);
+        });
+        deleteCell.appendChild(deleteButton);
     });
+    }
+
+    function deletePassword(index) {
+        userData.passwords.splice(index, 1); 
+        localStorage.setItem('passman_userdata', JSON.stringify(userData));
+        displayPasswordList();
     }
 
     // adds a new password
